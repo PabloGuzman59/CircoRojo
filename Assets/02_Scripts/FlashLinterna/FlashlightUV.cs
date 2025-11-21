@@ -3,6 +3,7 @@ using UnityEngine;
 public class FlashlightUV : MonoBehaviour
 {
     public Light uvLight;
+
     public float maxCharge = 100f;
     public float charge = 100f;
     public float drain = 15f;
@@ -13,22 +14,31 @@ public class FlashlightUV : MonoBehaviour
     public Transform cam;
     public float dist = 10f;
 
+    // NUEVO: referencia a la linterna normal
+    public FlashlightNormal normalFlashlight;
+
     void Update()
     {
+        // BOTÓN DERECHO (activar UV)
         if (Input.GetMouseButton(1))
         {
             if (charge > 0)
             {
+                // APAGAR LA LINTERNA NORMAL
+                if (normalFlashlight != null)
+                    normalFlashlight.TurnOff();
+
                 uvLight.enabled = true;
                 charge -= drain * Time.deltaTime;
 
+                // RAYCAST
                 if (Physics.Raycast(cam.position, cam.forward, out RaycastHit hit, dist))
                 {
-                    var m = hit.collider.GetComponent<MonsterAI>();
-                    if (m != null) m.ApplyUV();
-
-                    //var min = hit.collider.GetComponent<MinionAI>();
-                    //if (min != null) min.ApplyUV();
+                    var monster = hit.collider.GetComponent<MonsterAI>();
+                    if (monster != null)
+                    {
+                        monster.ApplyUV();
+                    }
                 }
             }
             else
@@ -42,6 +52,7 @@ public class FlashlightUV : MonoBehaviour
             charge += recharge * Time.deltaTime;
         }
 
+        // RECARGAR CON R
         if (Input.GetKeyDown(KeyCode.R) && inv.batteryCount > 0)
         {
             inv.batteryCount--;

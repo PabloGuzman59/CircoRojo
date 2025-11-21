@@ -10,8 +10,11 @@ public class CardItem : SimpleInteractable
         if (cardId == 2) inv.card2 = true;
         if (cardId == 3) inv.card3 = true;
 
-        Debug.Log("Recogiste tarjeta " + cardId);
-        // Aquí se llamaría a la UI
+        Debug.Log("Tarjeta " + cardId + " recogida");
+
+        // Aquí va la UI (cuando la tengas)
+        // UIManager.Instance.UpdateCards();
+
         Destroy(gameObject);
     }
 }

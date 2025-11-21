@@ -5,6 +5,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     public int activatedGenerators = 0;
+
     public MonsterAI monster;
     public ExitDoor exitDoor;
 
@@ -16,7 +17,7 @@ public class GameManager : MonoBehaviour
     public void OnGeneratorActivated(int id)
     {
         activatedGenerators++;
-        Debug.Log("Generadores activados: " + activatedGenerators);
+        Debug.Log("GAMEMANAGER: Generadores activados = " + activatedGenerators);
 
         if (activatedGenerators == 1)
         {
@@ -29,7 +30,31 @@ public class GameManager : MonoBehaviour
         else if (activatedGenerators == 3)
         {
             monster.SetPhase(3);
-            exitDoor.Unlock();
+
+            if (exitDoor != null)
+            {
+                exitDoor.Unlock();
+            }
+            else
+            {
+                Debug.LogWarning("GAMEMANAGER: exitDoor no asignado en el inspector.");
+            }
         }
+    }
+
+    public void PlayerDied()
+    {
+        Debug.Log("GAME MANAGER: Se registró la muerte del jugador.");
+        Debug.Log("GAME OVER: Aquí más adelante activaremos la UI de derrota.");
+
+        // Más adelante:
+        // UIManager.Instance.ShowDeathScreen();
+        // Stop time, fade, etc.
+    }
+
+    public void PlayerEscaped()
+    {
+        Debug.Log("GAMEMANAGER: El jugador ha escapado. VICTORIA.");
+        // Aquí luego: UI de victoria, cambiar de escena, etc.
     }
 }

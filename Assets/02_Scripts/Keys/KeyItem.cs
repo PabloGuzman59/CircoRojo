@@ -12,7 +12,8 @@ public class KeyItem : SimpleInteractable
         if (keyId == 4) inv.key4 = true;
 
         Debug.Log("Recogiste llave " + keyId);
-        // Aquí la UI actualizaría inventario
+        // Aquí llamas a la UI
+
         Destroy(gameObject);
     }
 }

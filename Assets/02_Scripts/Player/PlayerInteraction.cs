@@ -4,7 +4,6 @@ public class PlayerInteraction : MonoBehaviour
 {
     public Transform cam;
     public float distance = 3f;
-
     public PlayerInventory inv;
 
     void Update()

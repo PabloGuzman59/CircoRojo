@@ -4,19 +4,22 @@ using UnityEngine.AI;
 public class MonsterAI : MonoBehaviour
 {
     public NavMeshAgent agent;
-    public Transform[] patrolPoints;
-
-    int currentPoint = 0;
-    int phase = 0;
-
-    bool canBeStunned_ByUV = false;
-    bool canBeStunned_ByTrap = false;
-
-    bool stunned = false;
-    float stunTimer = 0f;
-
     public Transform player;
-    public float chaseDistance = 10f;
+
+    public Transform[] patrolPoints;
+    private int currentPoint = 0;
+
+    public float detectionRange = 10f;
+
+    private bool stunned = false;
+    private float stunTimer = 0f;
+
+    private int currentPhase = 0;
+
+    void Start()
+    {
+        agent = GetComponent<NavMeshAgent>();
+    }
 
     void Update()
     {
@@ -31,63 +34,48 @@ public class MonsterAI : MonoBehaviour
             return;
         }
 
-        float dist = Vector3.Distance(transform.position, player.position);
+        float distToPlayer = Vector3.Distance(transform.position, player.position);
 
-        if (dist < chaseDistance)
+        if (distToPlayer <= detectionRange)
         {
+            // Persigue al jugador
             agent.SetDestination(player.position);
         }
         else
         {
+            // Patrulla
             Patrol();
         }
     }
 
     void Patrol()
     {
+        if (patrolPoints.Length == 0) return;
+
         if (Vector3.Distance(transform.position, patrolPoints[currentPoint].position) < 1f)
         {
             currentPoint = (currentPoint + 1) % patrolPoints.Length;
         }
+
         agent.SetDestination(patrolPoints[currentPoint].position);
-    }
-
-    public void SetPhase(int newPhase)
-    {
-        phase = newPhase;
-
-        if (phase == 1)
-        {
-            agent.speed = 3f;
-            canBeStunned_ByUV = true;
-            canBeStunned_ByTrap = true;
-        }
-        if (phase == 2)
-        {
-            agent.speed = 4f;
-            canBeStunned_ByUV = false;
-            canBeStunned_ByTrap = true;
-        }
-        if (phase == 3)
-        {
-            agent.speed = 6f;
-            canBeStunned_ByUV = false;
-            canBeStunned_ByTrap = false;
-        }
-
-        Debug.Log("Monstruo fase " + phase);
     }
 
     public void ApplyUV()
     {
-        if (!canBeStunned_ByUV) return;
-        Stun(2f);
+        if (currentPhase == 1)
+        {
+            Stun(2f);
+            Debug.Log("Monstruo stuneado por UV (fase 1)");
+        }
     }
 
     public void ApplyTrap()
     {
-        if (!canBeStunned_ByTrap) return;
-        Stun(3f);
+        if (currentPhase <= 2)
+        {
+            Stun(3f);
+            Debug.Log("Monstruo stuneado por trampa");
+        }
     }
 
     void Stun(float time)
@@ -95,6 +83,35 @@ public class MonsterAI : MonoBehaviour
         stunned = true;
         stunTimer = time;
         agent.isStopped = true;
-        Debug.Log("Monstruo stuneado " + time + "s");
     }
+
+    public void SetPhase(int phase)
+    {
+        currentPhase = phase;
+
+        if (phase == 1)
+        {
+            agent.speed = 3f;
+        }
+        else if (phase == 2)
+        {
+            agent.speed = 4.5f;
+        }
+        else if (phase == 3)
+        {
+            agent.speed = 6f;
+        }
+
+        Debug.Log("Monstruo ahora está en fase " + phase);
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            Debug.Log("MONSTRUO: El jugador ha sido atrapado.");
+            playerHealth.KillPlayer();
+        }
+    }
+
 }
