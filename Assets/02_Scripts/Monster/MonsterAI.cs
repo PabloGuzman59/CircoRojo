@@ -19,6 +19,11 @@ public class MonsterAI : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        agent.updateRotation = true;
+        agent.updatePosition = true;
+
+        // ir al primer punto
+        if (patrolPoints.Length > 0) SetNextPatrolPoint();
     }
 
     void Update()
@@ -38,12 +43,10 @@ public class MonsterAI : MonoBehaviour
 
         if (distToPlayer <= detectionRange)
         {
-            // Persigue al jugador
             agent.SetDestination(player.position);
         }
         else
         {
-            // Patrulla
             Patrol();
         }
     }
@@ -52,12 +55,25 @@ public class MonsterAI : MonoBehaviour
     {
         if (patrolPoints.Length == 0) return;
 
-        if (Vector3.Distance(transform.position, patrolPoints[currentPoint].position) < 1f)
+        if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
             currentPoint = (currentPoint + 1) % patrolPoints.Length;
+            SetNextPatrolPoint();
         }
+    }
 
-        agent.SetDestination(patrolPoints[currentPoint].position);
+    void SetNextPatrolPoint()
+    {
+        NavMeshHit hit;
+
+        if (NavMesh.SamplePosition(patrolPoints[currentPoint].position, out hit, 1f, NavMesh.AllAreas))
+        {
+            agent.SetDestination(hit.position);
+        }
+        else
+        {
+            Debug.LogWarning("Patrol point fuera del NavMesh: " + patrolPoints[currentPoint].name);
+        }
     }
 
     public void ApplyUV()
@@ -90,20 +106,15 @@ public class MonsterAI : MonoBehaviour
         currentPhase = phase;
 
         if (phase == 1)
-        {
             agent.speed = 3f;
-        }
         else if (phase == 2)
-        {
             agent.speed = 4.5f;
-        }
         else if (phase == 3)
-        {
             agent.speed = 6f;
-        }
 
         Debug.Log("Monstruo ahora está en fase " + phase);
     }
+
     private void OnTriggerEnter(Collider other)
     {
         PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
@@ -113,5 +124,4 @@ public class MonsterAI : MonoBehaviour
             playerHealth.KillPlayer();
         }
     }
-
 }
