@@ -34,12 +34,16 @@ public class FlashlightUV : MonoBehaviour
                 // RAYCAST
                 if (Physics.Raycast(cam.position, cam.forward, out RaycastHit hit, dist))
                 {
+                    var min = hit.collider.GetComponent<MinionAI>();
+                    if (min != null) min.ApplyUV();
+
                     var monster = hit.collider.GetComponent<MonsterAI>();
                     if (monster != null)
                     {
                         monster.ApplyUV();
                     }
                 }
+
             }
             else
             {
