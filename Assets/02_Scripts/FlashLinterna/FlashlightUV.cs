@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FlashlightUV : MonoBehaviour
 {
@@ -19,7 +19,7 @@ public class FlashlightUV : MonoBehaviour
 
     void Update()
     {
-        // BOT�N DERECHO (activar UV)
+        // BOTÓN DERECHO (activar UV)
         if (Input.GetMouseButton(1))
         {
             if (charge > 0)
@@ -31,15 +31,22 @@ public class FlashlightUV : MonoBehaviour
                 uvLight.enabled = true;
                 charge -= drain * Time.deltaTime;
 
-                // RAYCAST
+                // RAYCAST UV
                 if (Physics.Raycast(cam.position, cam.forward, out RaycastHit hit, dist))
                 {
-                    var min = hit.collider.GetComponent<MinionAI>();
-                    if (min != null) min.ApplyUV();
+                    // MINION
+                    var min = hit.collider.GetComponentInParent<MinionAI>();
+                    if (min != null)
+                    {
+                        Debug.Log("UV HIT → MINION");
+                        min.ApplyUV();
+                    }
 
-                    var monster = hit.collider.GetComponent<MonsterAI>();
+                    // MONSTER
+                    var monster = hit.collider.GetComponentInParent<MonsterAI>();
                     if (monster != null)
                     {
+                        Debug.Log("UV HIT → MONSTER");
                         monster.ApplyUV();
                     }
                 }
@@ -65,6 +72,6 @@ public class FlashlightUV : MonoBehaviour
         }
 
         charge = Mathf.Clamp(charge, 0, maxCharge);
-        // Aqu� se actualizar�a la UI
+        // Aquí se actualizaría la UI
     }
 }

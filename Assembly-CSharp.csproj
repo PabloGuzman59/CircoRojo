@@ -70,6 +70,7 @@
     <Compile Include="Assets\02_Scripts\Generator\Generator.cs" />
     <Compile Include="Assets\02_Scripts\Minion\MinionSpawner.cs" />
     <Compile Include="Assets\02_Scripts\FlashLinterna\FlashlightUV.cs" />
+    <Compile Include="Assets\02_Scripts\PlayerVR\XRPlayerGravity.cs" />
     <Compile Include="Assets\02_Scripts\Player\PlayerLook.cs" />
     <Compile Include="Assets\02_Scripts\Player\PlayerInteraction.cs" />
     <Compile Include="Assets\02_Scripts\Minion\MinionInitializer.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Assets\02_Scripts\GameManager\SimpleInteractable.cs" />
     <Compile Include="Assets\02_Scripts\GameManager\GameManager.cs" />
     <Compile Include="Assets\02_Scripts\Minion\MinionAI.cs" />
+    <Compile Include="Assets\02_Scripts\PlayerVR\XRPlayerMovement.cs" />
     <Compile Include="Assets\02_Scripts\Player\PlayerMovement.cs" />
     <Compile Include="Assets\02_Scripts\Monster\MonsterAI.cs" />
     <Compile Include="Assets\02_Scripts\Minion\PlayerMinionSpawner.cs" />

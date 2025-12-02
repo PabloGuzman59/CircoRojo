@@ -117,11 +117,12 @@ public class MonsterAI : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
+        PlayerHealthVR health = other.GetComponentInParent<PlayerHealthVR>();
+
+        if (health != null)
         {
-            Debug.Log("MONSTRUO: El jugador ha sido atrapado.");
-            playerHealth.KillPlayer();
+            Debug.Log("MONSTRUO: atrapó al jugador.");
+            health.KillPlayer();
         }
     }
 }
