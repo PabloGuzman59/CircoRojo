@@ -14,6 +14,19 @@ public class GameManager : MonoBehaviour
         instance = this;
     }
 
+    void Start()
+    {
+        // NUEVO: Iniciar en fase 0 (modo pasivo)
+        if (monster != null)
+        {
+            monster.SetPhase(0);
+        }
+        else
+        {
+            Debug.LogWarning("GAMEMANAGER: Monster no asignado en el inspector.");
+        }
+    }
+
     public void OnGeneratorActivated(int id)
     {
         activatedGenerators++;
@@ -21,15 +34,24 @@ public class GameManager : MonoBehaviour
 
         if (activatedGenerators == 1)
         {
-            monster.SetPhase(1);
+            if (monster != null)
+                monster.SetPhase(1);
+            else
+                Debug.LogWarning("GAMEMANAGER: Monster no asignado.");
         }
         else if (activatedGenerators == 2)
         {
-            monster.SetPhase(2);
+            if (monster != null)
+                monster.SetPhase(2);
+            else
+                Debug.LogWarning("GAMEMANAGER: Monster no asignado.");
         }
         else if (activatedGenerators == 3)
         {
-            monster.SetPhase(3);
+            if (monster != null)
+                monster.SetPhase(3);
+            else
+                Debug.LogWarning("GAMEMANAGER: Monster no asignado.");
 
             if (exitDoor != null)
             {
