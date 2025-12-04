@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class MinionAI : MonoBehaviour
@@ -25,13 +25,9 @@ public class MinionAI : MonoBehaviour
         float distToPlayer = Vector3.Distance(transform.position, player.position);
 
         if (distToPlayer <= detectionRange)
-        {
             agent.SetDestination(player.position);
-        }
         else
-        {
             Patrol();
-        }
     }
 
     void Patrol()
@@ -39,42 +35,68 @@ public class MinionAI : MonoBehaviour
         if (patrolPoints.Length == 0) return;
 
         if (Vector3.Distance(transform.position, patrolPoints[currentPoint].position) < 1f)
-        {
             currentPoint = (currentPoint + 1) % patrolPoints.Length;
-        }
 
         agent.SetDestination(patrolPoints[currentPoint].position);
     }
 
+    // ============================================================
+    //  MUERTE POR LUZ UV
+    // ============================================================
     public void ApplyUV()
     {
         if (dead) return;
 
         Debug.Log("MINION: Destruido por luz UV.");
         dead = true;
-
         Destroy(gameObject);
     }
 
+    // ============================================================
+    //  COLISIONES CON PLAYER (3D)
+    // ============================================================
     private void OnTriggerEnter(Collider other)
     {
-        // Si toca al jugador, lo ralentiza
-        PlayerMovement pm = other.GetComponent<PlayerMovement>();
-        if (pm != null)
+        Debug.Log("MINION: Algo entró → " + other.name);
+        // 1. Buscar PlayerHealth
+        PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
+
+        // 2. Buscar PlayerMovement
+        PlayerMovement movement = other.GetComponentInParent<PlayerMovement>();
+
+        if (health != null)
         {
-            StartCoroutine(SlowPlayer(pm));
+            Debug.Log("MINION: Tocando al jugador → muerte en 4 segundos.");
+            StartCoroutine(KillAfterSeconds(health));
+        }
+
+        if (movement != null)
+        {
+            Debug.Log("MINION: Ralentizando jugador...");
+            StartCoroutine(SlowPlayer(movement));
         }
     }
 
+    // ============================================================
+    //  Ralentizar jugador
+    // ============================================================
     System.Collections.IEnumerator SlowPlayer(PlayerMovement pm)
     {
-        Debug.Log("MINION: Ralentizando jugador...");
         float originalSpeed = pm.walkSpeed;
         pm.walkSpeed = 2f;
 
         yield return new WaitForSeconds(2f);
 
         pm.walkSpeed = originalSpeed;
-        Debug.Log("MINION: Efecto terminado.");
+        Debug.Log("MINION: Ralentización terminada.");
+    }
+
+    // ============================================================
+    //  Matar luego de 4 segundos
+    // ============================================================
+    System.Collections.IEnumerator KillAfterSeconds(PlayerHealth health)
+    {
+        yield return new WaitForSeconds(4f);
+        health.KillPlayer();
     }
 }
