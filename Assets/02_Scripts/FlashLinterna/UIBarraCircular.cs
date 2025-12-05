@@ -25,5 +25,6 @@ public class UIBarraCircular : MonoBehaviour
     {
         if (fillImage == null) return;
         fillImage.fillAmount = valorActual / valorMaximo;
+    
     }
 }
