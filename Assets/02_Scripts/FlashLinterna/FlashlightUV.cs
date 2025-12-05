@@ -16,6 +16,8 @@ public class FlashlightUV : MonoBehaviour
 
     // NUEVO: referencia a la linterna normal
     public FlashlightNormal normalFlashlight;
+    // ✅ AÑADE ESTA LÍNEA:
+    public UIBarraCircular uiBarra;
 
     void Update()
     {
@@ -73,5 +75,8 @@ public class FlashlightUV : MonoBehaviour
 
         charge = Mathf.Clamp(charge, 0, maxCharge);
         // Aquí se actualizaría la UI
+        // ✅ AÑADE ESTAS 2 LÍNEAS:
+        if (uiBarra != null)
+            uiBarra.ActualizarBarra(charge, maxCharge);
     }
 }

@@ -71,6 +71,7 @@
     <Compile Include="Assets\02_Scripts\Player\PlayerInteraction.cs" />
     <Compile Include="Assets\02_Scripts\menu\VRMenuController.cs" />
     <Compile Include="Assets\02_Scripts\FlashLinterna\FlashlightNormal.cs" />
+    <Compile Include="Assets\02_Scripts\FlashLinterna\UIBarraCircular.cs" />
     <Compile Include="Assets\02_Scripts\Doors\ExitDoor.cs" />
     <Compile Include="Assets\02_Scripts\Player\PlayerHealth.cs" />
     <Compile Include="Assets\02_Scripts\menu\SettingsManager.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Assets\02_Scripts\Player\PlayerMovement.cs" />
     <Compile Include="Assets\02_Scripts\Monster\MonsterAI.cs" />
     <Compile Include="Assets\02_Scripts\Keys\KeyItem.cs" />
+    <Compile Include="Assets\02_Scripts\FlashLinterna\UIManager.cs" />
     <Compile Include="Assets\02_Scripts\Traps\ElectricTrap.cs" />
     <Compile Include="Assets\02_Scripts\Cards\CardItem.cs" />
   </ItemGroup>

@@ -12,8 +12,11 @@ public class CardItem : SimpleInteractable
 
         Debug.Log("Tarjeta " + cardId + " recogida");
 
-        // Aquí va la UI (cuando la tengas)
-        // UIManager.Instance.UpdateCards();
+        // Actualizar UI
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateCards(inv);
+        }
 
         Destroy(gameObject);
     }
