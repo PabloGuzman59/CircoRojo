@@ -62,13 +62,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\02_Scripts\Player\PlayerInventory.cs" />
+    <Compile Include="Assets\02_Scripts\Player\PlayerHitbox.cs" />
+    <Compile Include="Assets\02_Scripts\Minion\MapMinionSpawner.cs" />
     <Compile Include="Assets\02_Scripts\Doors\LockedDoor.cs" />
     <Compile Include="Assets\02_Scripts\Battery\BatteryItem.cs" />
+    <Compile Include="Assets\02_Scripts\PlayerVR\PlayerHealthVR.cs" />
     <Compile Include="Assets\02_Scripts\Generator\Generator.cs" />
     <Compile Include="Assets\02_Scripts\Minion\MinionSpawner.cs" />
     <Compile Include="Assets\02_Scripts\FlashLinterna\FlashlightUV.cs" />
+    <Compile Include="Assets\02_Scripts\PlayerVR\XRPlayerGravity.cs" />
     <Compile Include="Assets\02_Scripts\Player\PlayerLook.cs" />
     <Compile Include="Assets\02_Scripts\Player\PlayerInteraction.cs" />
+    <Compile Include="Assets\02_Scripts\Minion\MinionInitializer.cs" />
+    <Compile Include="Assets\Forst\CTI Runtime Components\CTI Runtime Components URP 14plus\Scripts\CTI_URP_CustomWind.cs" />
     <Compile Include="Assets\02_Scripts\menu\VRMenuController.cs" />
     <Compile Include="Assets\02_Scripts\FlashLinterna\FlashlightNormal.cs" />
     <Compile Include="Assets\02_Scripts\FlashLinterna\UIBarraCircular.cs" />
@@ -79,8 +85,10 @@
     <Compile Include="Assets\02_Scripts\GameManager\SimpleInteractable.cs" />
     <Compile Include="Assets\02_Scripts\GameManager\GameManager.cs" />
     <Compile Include="Assets\02_Scripts\Minion\MinionAI.cs" />
+    <Compile Include="Assets\02_Scripts\PlayerVR\XRPlayerMovement.cs" />
     <Compile Include="Assets\02_Scripts\Player\PlayerMovement.cs" />
     <Compile Include="Assets\02_Scripts\Monster\MonsterAI.cs" />
+    <Compile Include="Assets\02_Scripts\Minion\PlayerMinionSpawner.cs" />
     <Compile Include="Assets\02_Scripts\Keys\KeyItem.cs" />
     <Compile Include="Assets\02_Scripts\FlashLinterna\UIManager.cs" />
     <Compile Include="Assets\02_Scripts\Traps\ElectricTrap.cs" />
@@ -89,12 +97,22 @@
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\Forst\CTI Runtime Components\CTI Runtime Components URP 14plus\Shaders\Includes\CTI URP SG Lighting.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\Forst\CTI Runtime Components\CTI Runtime Components URP 14plus\Shaders\Includes\CTI URP SG BillboardVertex.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\HDIconsPackFree_Vol.2\readme_english.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\Forst\CTI Runtime Components\CTI Runtime Components URP 14plus\Shaders\Includes\CTI URP SG BillboardVertexSimple.hlsl" />
+    <None Include="Assets\Forst\CTI Runtime Components\CTI Runtime Components URP 14plus\Shaders\Includes\CTI URP SG Utils.hlsl" />
+    <None Include="Assets\Forst\CTI Runtime Components\CTI Runtime Components URP 14plus\Shaders\Includes\CTI URP SG BillboardFragment.hlsl" />
+    <None Include="Assets\Shader\PurpleGlow.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
+    <None Include="Assets\Shader\Terrar.shader" />
+    <None Include="Assets\Shader\RedGlow.shader" />
+    <None Include="Assets\Forst\CTI Runtime Components\CTI Runtime Components URP 14plus\Known Issues.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
@@ -102,12 +120,18 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\Shader\BlueGalaxia_Interactive.shader" />
+    <None Include="Assets\Shader\GreenGlow.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\Forst\Conifers [BOTD]\Render Pipeline Support\URP\Known Issues.txt" />
+    <None Include="Assets\Shader\TubularGalaxyElectric.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\HDIconsPackFree_Vol.2\readme_japanese.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\Forst\CTI Runtime Components\CTI Runtime Components URP 14plus\Shaders\Includes\CTI URP SG Wind.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
@@ -1132,6 +1156,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.AI.Navigation.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.TerrainTools.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.TerrainTools.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.XR.OpenXR.Features.OculusQuestSupport">
       <HintPath>Library\ScriptAssemblies\Unity.XR.OpenXR.Features.OculusQuestSupport.dll</HintPath>
       <Private>False</Private>
@@ -1154,6 +1182,10 @@
     </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TerrainTools">
+      <HintPath>Library\ScriptAssemblies\Unity.TerrainTools.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Timeline">
@@ -1338,6 +1370,10 @@
     </Reference>
     <Reference Include="Unity.XR.OpenXR.Features.MetaQuestSupport">
       <HintPath>Library\ScriptAssemblies\Unity.XR.OpenXR.Features.MetaQuestSupport.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">

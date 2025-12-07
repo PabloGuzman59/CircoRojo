@@ -1,14 +1,10 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 
 public class VRMenuController : MonoBehaviour
 {
     [Header("Panels")]
     public GameObject mainPanel;      // PanelMain
     public GameObject optionsPanel;   // PanelOptions
-
-    [Header("Scene")]
-    public string sceneToLoad = "Scena Martin";
 
     void Start()
     {
@@ -23,7 +19,13 @@ public class VRMenuController : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene(sceneToLoad);
+        // 👉 Ya NO cargas ninguna escena.
+        // Simplemente ocultas el menú.
+        if (mainPanel != null) mainPanel.SetActive(false);
+        if (optionsPanel != null) optionsPanel.SetActive(false);
+
+        // Aquí puedes activar HUD, scripts del jugador, etc. si lo necesitas
+        // playerController.enabled = true;  ← ejemplo
     }
 
     public void OpenOptions()

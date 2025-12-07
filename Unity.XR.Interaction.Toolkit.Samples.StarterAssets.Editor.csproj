@@ -56,15 +56,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
-<<<<<<< HEAD
     <Analyzer Include="D:\Unity\editors\6000.0.62f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="D:\Unity\editors\6000.0.62f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="D:\Unity\editors\6000.0.62f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
-=======
-    <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
-    <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
-    <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
->>>>>>> 8d08a5d (implementacion de UI controles)
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Samples\XR Interaction Toolkit\3.0.9\Starter Assets\Editor\Scripts\StarterAssetsSampleProjectValidation.cs" />
