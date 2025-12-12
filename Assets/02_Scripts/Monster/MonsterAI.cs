@@ -25,6 +25,16 @@ public class MonsterAI : MonoBehaviour
     public float uvStunTime = 2f;
     public float trapStunTime = 3f;
 
+    // ============================
+    //  ANIMATOR
+    // ============================
+    private Animator animator;
+
+    void Awake()
+    {
+        animator = GetComponentInChildren<Animator>(); // Busca animador automáticamente
+    }
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -39,35 +49,54 @@ public class MonsterAI : MonoBehaviour
         if (stunned)
         {
             stunTimer -= Time.deltaTime;
+            animator.SetBool("isStunned", true);
+            animator.SetBool("isWalking", false);
+            animator.SetBool("isChasing", false);
+
             if (stunTimer <= 0)
             {
                 stunned = false;
                 agent.isStopped = false;
 
+                animator.SetBool("isStunned", false);
+
                 // Al recuperar: monstruo vuelve a modo pasivo (fase 0 temporal)
                 isPassive = true;
                 currentPhase = 0;
                 uvHits = 0;
-
-                Debug.Log("MONSTER: Recuperó control y vuelve a patrullar (modo pasivo)");
             }
             return;
         }
 
-        // --- MODO PASIVO → patrulla y NO persigue, NO mata ---
+        // --- MODO PASIVO → patrulla ---
         if (isPassive)
         {
             Patrol();
+            UpdateAnimations();
             return;
         }
 
-        // --- MODO ACTIVO (fase 1, 2, 3) ---
+        // --- MODO ACTIVO ---
         float distToPlayer = Vector3.Distance(transform.position, player.position);
 
         if (distToPlayer <= detectionRange)
             agent.SetDestination(player.position);
         else
             Patrol();
+
+        UpdateAnimations();
+    }
+
+    // ===============================
+    //       ANIMACIONES
+    // ===============================
+    void UpdateAnimations()
+    {
+        bool walking = agent.velocity.magnitude > 0.1f;
+        animator.SetBool("isWalking", walking);
+
+        bool chasing = (!isPassive && !stunned);
+        animator.SetBool("isChasing", chasing);
     }
 
     void Patrol()
@@ -92,42 +121,38 @@ public class MonsterAI : MonoBehaviour
     // ===============================
     //              UV
     // ===============================
-    public void ApplyUV()
+    public void ApplyUV(bool active)
     {
-        // En fase pasiva, UV no debería hacer nada
-        if (isPassive)
+        if (active)
         {
-            Debug.Log("UV no afecta al monstruo en modo pasivo");
-            return;
-        }
-
-        // Fase 1 → stun directo
-        if (currentPhase == 1)
-        {
-            Debug.Log("UV → stun directo (fase 1)");
-            ApplyStun(uvStunTime);
-            return;
-        }
-
-        // Fase 2 → necesita 2 golpes UV
-        if (currentPhase == 2)
-        {
-            uvHits++;
-            Debug.Log("UV HIT fase 2: " + uvHits);
-
-            if (uvHits >= 2)
+            if (isPassive)
             {
-                ApplyStun(uvStunTime);
-                uvHits = 0;
+                Debug.Log("UV no afecta al monstruo en modo pasivo");
+                return;
             }
 
-            return;
-        }
+            if (currentPhase == 1)
+            {
+                ApplyStun(uvStunTime);
+                return;
+            }
 
-        // Fase 3 → no funciona UV
-        if (currentPhase == 3)
-        {
-            Debug.Log("UV no afecta al monstruo en fase 3");
+            if (currentPhase == 2)
+            {
+                uvHits++;
+
+                if (uvHits >= 2)
+                {
+                    ApplyStun(uvStunTime);
+                    uvHits = 0;
+                }
+                return;
+            }
+
+            if (currentPhase == 3)
+            {
+                Debug.Log("UV no afecta al monstruo en fase 3");
+            }
         }
     }
 
@@ -140,12 +165,7 @@ public class MonsterAI : MonoBehaviour
 
         if (currentPhase <= 2)
         {
-            Debug.Log("Monstruo stuneado por trampa");
             ApplyStun(trapStunTime);
-        }
-        else
-        {
-            Debug.Log("Trampa no afecta en fase 3");
         }
     }
 
@@ -155,7 +175,7 @@ public class MonsterAI : MonoBehaviour
         agent.isStopped = true;
         stunTimer = time;
 
-        Debug.Log("MONSTER: STUN por " + time + "s");
+        animator.SetBool("isStunned", true);
     }
 
     // ===============================
@@ -166,16 +186,13 @@ public class MonsterAI : MonoBehaviour
         currentPhase = phase;
         uvHits = 0;
 
-        // Fase 0 (patrullar)
         if (phase == 0)
         {
             isPassive = true;
             agent.speed = 2f;
-            Debug.Log("MONSTER → Modo pasivo (Fase 0)");
             return;
         }
 
-        // Fase activa
         isPassive = false;
 
         if (phase == 1)
@@ -184,8 +201,6 @@ public class MonsterAI : MonoBehaviour
             agent.speed = 4.5f;
         else if (phase == 3)
             agent.speed = 6f;
-
-        Debug.Log("MONSTER → Fase " + phase + " (activo)");
     }
 
     // ===============================
@@ -195,15 +210,10 @@ public class MonsterAI : MonoBehaviour
     {
         PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
 
-        // Sólo puede matar si está activo (fase 1, 2, 3)
         if (health != null && !isPassive)
         {
-            Debug.Log("MONSTER: Jugador atrapado → muerte inmediata");
+            animator.SetBool("isDead", true); // animación game over
             health.KillPlayer();
-        }
-        else if (health != null)
-        {
-            Debug.Log("MONSTER TOCA AL PLAYER, pero está en modo pasivo");
         }
     }
 }

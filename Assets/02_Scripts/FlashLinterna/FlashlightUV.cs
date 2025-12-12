@@ -41,7 +41,7 @@ public class FlashlightUV : MonoBehaviour
                     if (min != null)
                     {
                         Debug.Log("UV HIT → MINION");
-                        min.ApplyUV();
+                        //min.ApplyUV();
                     }
 
                     // MONSTER
@@ -49,7 +49,7 @@ public class FlashlightUV : MonoBehaviour
                     if (monster != null)
                     {
                         Debug.Log("UV HIT → MONSTER");
-                        monster.ApplyUV();
+                        //monster.ApplyUV();
                     }
                 }
 

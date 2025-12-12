@@ -18,6 +18,10 @@ public class FlashlightUV_VR : MonoBehaviour
 
     public InputActionReference uvButton; // Acción del XR Controller
 
+    // --- NUEVO ---
+    private MinionAI lastMinion;
+    private MonsterAI lastMonster;
+
     void Update()
     {
         bool isPressed = uvButton.action.IsPressed();
@@ -31,17 +35,47 @@ public class FlashlightUV_VR : MonoBehaviour
             {
                 var min = hit.collider.GetComponentInParent<MinionAI>();
                 if (min != null)
-                    min.ApplyUV();
+                {
+                    min.ApplyUV(true);   // <<< CORREGIDO
+                    lastMinion = min;
+                }
+                else if (lastMinion != null)
+                {
+                    lastMinion.ApplyUV(false);
+                    lastMinion = null;
+                }
 
                 var monster = hit.collider.GetComponentInParent<MonsterAI>();
                 if (monster != null)
-                    monster.ApplyUV();
+                {
+                    monster.ApplyUV(true);  // <<< CORREGIDO
+                    lastMonster = monster;
+                }
+                else if (lastMonster != null)
+                {
+                    lastMonster.ApplyUV(false);
+                    lastMonster = null;
+                }
             }
         }
         else
         {
             uvLight.enabled = false;
             charge += recharge * Time.deltaTime;
+
+            // Si sueltas el botón o se apaga la linterna,
+            // detén el efecto UV en el minion o monstruo
+            if (lastMinion != null)
+            {
+                lastMinion.ApplyUV(false);
+                lastMinion = null;
+            }
+
+            if (lastMonster != null)
+            {
+                //lastMonster.ApplyUV(false);
+                lastMonster = null;
+            }
         }
 
         charge = Mathf.Clamp(charge, 0, maxCharge);
