@@ -12,6 +12,7 @@ EditorBuildSettings:
     path: Assets/01_Scenes/Scena Pablo/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 18cdec47a09a38c42bbd3603da66d2d7, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 1ffea74850e69bf488744f0ed64c2e07, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 428628c58ebe5d8478e63ae3d95c136c, type: 2}

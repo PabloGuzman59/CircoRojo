@@ -1,42 +1,62 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit;
 
 public class FlashlightUV_VR : MonoBehaviour
 {
+    [Header("Light")]
     public Light uvLight;
 
+    [Header("Energy")]
     public float maxCharge = 100f;
     public float charge = 100f;
     public float drain = 15f;
     public float recharge = 5f;
 
+    [Header("Inventory")]
     public PlayerInventory inv;
 
-    public Transform handDirection; // mano derecha o ancla del láser
+    [Header("Raycast")]
+    public Transform handDirection; // Mano derecha o ancla del láser
     public float dist = 10f;
 
-    public InputActionReference uvButton; // Acción del XR Controller
+    [Header("Input")]
+    public InputActionReference uvButton; // Acción XR (gatillo, grip, etc)
 
-    // --- NUEVO ---
+    // Referencias a enemigos impactados
     private MinionAI lastMinion;
     private MonsterAI lastMonster;
 
+    void OnEnable()
+    {
+        if (uvButton != null)
+            uvButton.action.Enable();
+    }
+
+    void OnDisable()
+    {
+        if (uvButton != null)
+            uvButton.action.Disable();
+    }
+
     void Update()
     {
-        bool isPressed = uvButton.action.IsPressed();
+        bool isPressed = uvButton != null && uvButton.action.IsPressed();
 
         if (isPressed && charge > 0)
         {
             uvLight.enabled = true;
             charge -= drain * Time.deltaTime;
 
+            // DEBUG visual (opcional pero recomendado)
+            Debug.DrawRay(handDirection.position, handDirection.forward * dist, Color.magenta);
+
             if (Physics.Raycast(handDirection.position, handDirection.forward, out RaycastHit hit, dist))
             {
+                // --- MINION ---
                 var min = hit.collider.GetComponentInParent<MinionAI>();
                 if (min != null)
                 {
-                    min.ApplyUV(true);   // <<< CORREGIDO
+                    min.ApplyUV(true);
                     lastMinion = min;
                 }
                 else if (lastMinion != null)
@@ -45,10 +65,11 @@ public class FlashlightUV_VR : MonoBehaviour
                     lastMinion = null;
                 }
 
+                // --- MONSTER ---
                 var monster = hit.collider.GetComponentInParent<MonsterAI>();
                 if (monster != null)
                 {
-                    monster.ApplyUV(true);  // <<< CORREGIDO
+                    monster.ApplyUV(true);
                     lastMonster = monster;
                 }
                 else if (lastMonster != null)
@@ -63,22 +84,39 @@ public class FlashlightUV_VR : MonoBehaviour
             uvLight.enabled = false;
             charge += recharge * Time.deltaTime;
 
-            // Si sueltas el botón o se apaga la linterna,
-            // detén el efecto UV en el minion o monstruo
-            if (lastMinion != null)
-            {
-                lastMinion.ApplyUV(false);
-                lastMinion = null;
-            }
-
-            if (lastMonster != null)
-            {
-                //lastMonster.ApplyUV(false);
-                lastMonster = null;
-            }
+            // Al soltar el botón, limpiar estados UV
+            ClearUVEffects();
         }
 
         charge = Mathf.Clamp(charge, 0, maxCharge);
+    }
+
+    // Limpia cualquier efecto UV activo
+    void ClearUVEffects()
+    {
+        if (lastMinion != null)
+        {
+            lastMinion.ApplyUV(false);
+            lastMinion = null;
+        }
+
+        if (lastMonster != null)
+        {
+            lastMonster.ApplyUV(false);
+            lastMonster = null;
+        }
+    }
+
+    // Forzar apagado (para validaciones cruzadas)
+    public void ForceOff()
+    {
+        uvLight.enabled = false;
+        ClearUVEffects();
+    }
+
+    public void Set(bool state)
+    {
+        uvLight.enabled = state;
     }
 
     public void Recharge()

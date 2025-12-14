@@ -4,33 +4,35 @@ using UnityEngine.AI;
 public class MinionAI : MonoBehaviour
 {
     public NavMeshAgent agent;
-    //Punto de perseguimiento al player
+
+    // Punto de perseguimiento al player
     public Transform player;
-    //Puntos de patrulla del minion
+
+    // Puntos de patrulla del minion
     public Transform[] patrolPoints;
-    
     private int currentPoint = 0;
 
     public float detectionRange = 8f;
 
     private bool dead = false;
 
-    // Animaciones
+    // ============================
+    //  VARIABLES DE LUZ UV
+    // ============================
     private bool takingUV = false;
     private float uvTimer = 0f;
     public float uvRequiredTime = 4f; // tiempo necesario bajo UV
 
+    // 🔥 NUEVO: velocidad a la que se pierde el efecto UV
+    public float uvDecaySpeed = 1.5f;
 
-
-    //Animaciones
-
+    // Animaciones
     private Animator animator;
 
     void Awake()
     {
         animator = GetComponentInChildren<Animator>();
     }
-
 
     void Start()
     {
@@ -39,20 +41,43 @@ public class MinionAI : MonoBehaviour
 
     void Update()
     {
+        if (dead) return;
+
+        // ============================================================
+        //  LÓGICA DE MUERTE POR LUZ UV
+        // ============================================================
         if (takingUV)
         {
+            // Si está recibiendo UV, acumula tiempo
             uvTimer += Time.deltaTime;
+
+            agent.isStopped = true;
+
+            animator.SetBool("UnderUV", true);
+            animator.SetBool("IsWalking", false);
 
             if (uvTimer >= uvRequiredTime)
             {
                 DieByUV();
+                return;
+            }
+        }
+        else
+        {
+            // 🔥 CLAVE: NO reiniciar el contador de golpe
+            if (uvTimer > 0f)
+            {
+                uvTimer -= uvDecaySpeed * Time.deltaTime;
+                uvTimer = Mathf.Max(uvTimer, 0f);
             }
 
-            return; // NO persigue ni patrulla mientras está bajo UV
+            agent.isStopped = false;
+            animator.SetBool("UnderUV", false);
         }
 
-        if (dead) return;
-
+        // ============================================================
+        //  MOVIMIENTO NORMAL (PERSEGUIR / PATRULLAR)
+        // ============================================================
         float distToPlayer = Vector3.Distance(transform.position, player.position);
 
         if (distToPlayer <= detectionRange)
@@ -61,24 +86,24 @@ public class MinionAI : MonoBehaviour
             Patrol();
 
         // ACTUALIZAR ANIMACIÓN DE CAMINAR (MUY IMPORTANTE)
-        if (!takingUV && !dead)
-        {
-            bool isMoving = agent.velocity.magnitude > 0.05f;
-            animator.SetBool("IsWalking", isMoving);
-        }
+        bool isMoving = agent.velocity.magnitude > 0.05f;
+        animator.SetBool("IsWalking", isMoving);
     }
+
     void DieByUV()
     {
         if (dead) return;
         dead = true;
 
+        agent.isStopped = true;
+
         animator.SetBool("UnderUV", false);
         animator.SetBool("IsWalking", false);
-        animator.SetBool("IsScared", true);  // puedes usar Scared como estado de muerte si quieres
+        animator.SetBool("IsScared", true);  // animación de muerte
 
         Debug.Log("MINION MUERTO POR LUZ UV TRAS 4 SEGUNDOS");
 
-        Destroy(gameObject, 1.2f); // dale tiempo a animación de caída
+        Destroy(gameObject, 1.2f); // tiempo para animación
     }
 
     void Patrol()
@@ -92,52 +117,35 @@ public class MinionAI : MonoBehaviour
     }
 
     // ============================================================
-    //  MUERTE POR LUZ UV
+    //  INTERFAZ DE LUZ UV (LLAMADA DESDE LA LINTERNA)
     // ============================================================
     public void ApplyUV(bool active)
     {
         if (dead) return;
 
-        if (active)
-        {
-            if (!takingUV)
-            {
-                takingUV = true;
-                uvTimer = 0f;
-                agent.isStopped = true;
-
-                animator.SetBool("UnderUV", true);   // ACTIVAR ANIMACIÓN UV
-                animator.SetBool("IsWalking", false);
-            }
-        }
-        else
-        {
-            if (takingUV)
-            {
-                takingUV = false;
-                uvTimer = 0f;
-                agent.isStopped = false;
-
-                animator.SetBool("UnderUV", false);  // VOLVER A WALK SI CORRESPONDE
-            }
-        }
+        takingUV = active;
     }
 
     // ============================================================
-    //  COLISIONES CON PLAYER (3D)
+    //  COLISIONES CON PLAYER
     // ============================================================
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("MINION: Algo entró → " + other.name);
-        // 1. Buscar PlayerHealth
-        PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
 
-        // 2. Buscar PlayerMovement
+        PlayerHealthVR health = other.GetComponentInParent<PlayerHealthVR>();
         PlayerMovement movement = other.GetComponentInParent<PlayerMovement>();
 
         if (health != null)
         {
-             animator.SetBool("IsScared", true); // activa animación Monkey_GameOver
+            animator.SetBool("IsScared", true);
+            animator.SetBool("IsWalking", false);
+            animator.SetBool("IsChasing", false);
+
+            CameraControl cameraControl = Camera.main.GetComponent<CameraControl>();
+            if (cameraControl != null)
+                cameraControl.TriggerGameOver();
+
             Debug.Log("MINION: Tocando al jugador → muerte en 4 segundos.");
             StartCoroutine(KillAfterSeconds(health));
         }
@@ -164,9 +172,9 @@ public class MinionAI : MonoBehaviour
     }
 
     // ============================================================
-    //  Matar luego de 4 segundos
+    //  Matar jugador luego de 4 segundos
     // ============================================================
-    System.Collections.IEnumerator KillAfterSeconds(PlayerHealth health)
+    System.Collections.IEnumerator KillAfterSeconds(PlayerHealthVR health)
     {
         yield return new WaitForSeconds(4f);
         health.KillPlayer();

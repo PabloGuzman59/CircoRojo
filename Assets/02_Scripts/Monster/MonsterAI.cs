@@ -50,7 +50,7 @@ public class MonsterAI : MonoBehaviour
         {
             stunTimer -= Time.deltaTime;
             animator.SetBool("isStunned", true);
-            animator.SetBool("isWalking", false);
+            //animator.SetBool("isWalking", false);
             animator.SetBool("isChasing", false);
 
             if (stunTimer <= 0)
@@ -92,8 +92,8 @@ public class MonsterAI : MonoBehaviour
     // ===============================
     void UpdateAnimations()
     {
-        bool walking = agent.velocity.magnitude > 0.1f;
-        animator.SetBool("isWalking", walking);
+        //bool walking = agent.velocity.magnitude > 0.1f;
+        //animator.SetBool("isWalking", walking);
 
         bool chasing = (!isPassive && !stunned);
         animator.SetBool("isChasing", chasing);
@@ -208,7 +208,7 @@ public class MonsterAI : MonoBehaviour
     // ===============================
     private void OnTriggerEnter(Collider other)
     {
-        PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
+        PlayerHealthVR health = other.GetComponentInParent<PlayerHealthVR>();
 
         if (health != null && !isPassive)
         {
