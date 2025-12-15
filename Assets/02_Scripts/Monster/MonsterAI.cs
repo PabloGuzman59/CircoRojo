@@ -213,6 +213,8 @@ public class MonsterAI : MonoBehaviour
         if (health != null && !isPassive)
         {
             animator.SetBool("isDead", true); // animación game over
+
+
             health.KillPlayer();
         }
     }
