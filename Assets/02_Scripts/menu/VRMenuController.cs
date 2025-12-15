@@ -6,6 +6,9 @@ public class VRMenuController : MonoBehaviour
     public GameObject mainPanel;      // PanelMain
     public GameObject optionsPanel;   // PanelOptions
 
+    [Header("Objects to Remove on Start")]
+    public GameObject[] objectsToRemove; // ← aquí pones los 4 objetos
+
     void Start()
     {
         ShowMainMenu();
@@ -19,13 +22,21 @@ public class VRMenuController : MonoBehaviour
 
     public void StartGame()
     {
-        // 👉 Ya NO cargas ninguna escena.
-        // Simplemente ocultas el menú.
+        // Ocultar menú
         if (mainPanel != null) mainPanel.SetActive(false);
         if (optionsPanel != null) optionsPanel.SetActive(false);
 
-        // Aquí puedes activar HUD, scripts del jugador, etc. si lo necesitas
-        // playerController.enabled = true;  ← ejemplo
+        // 🔥 Eliminar objetos
+        if (objectsToRemove != null)
+        {
+            foreach (GameObject obj in objectsToRemove)
+            {
+                if (obj != null)
+                    Destroy(obj);
+            }
+        }
+
+        // Aquí puedes activar HUD, scripts del jugador, etc.
     }
 
     public void OpenOptions()
