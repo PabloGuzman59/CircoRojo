@@ -2,9 +2,9 @@ Shader "Custom/TubularGalaxyElectric"
 {
     Properties
     {
-        _NebulaColor1 ("Nebula Color 1", Color) = (0.3, 0.1, 0.8, 1)
-        _NebulaColor2 ("Nebula Color 2", Color) = (0.8, 0.2, 0.4, 1)
-        _StarColor ("Star Color", Color) = (1, 1, 0.8, 1)
+        _NebulaColor1 ("Nebula Color 1", Color) = (0.3, 0.1, 0.8, 1)  // Morado
+        _NebulaColor2 ("Nebula Color 2", Color) = (0.8, 0.2, 0.4, 1)  // Rosa morado
+        _StarColor ("Star Color", Color) = (0.2, 0.5, 1.0, 1)  // CAMBIADO: De blanco a azul
         _Intensity ("Glow Intensity", Range(0,10)) = 3
         _Speed ("Flow Speed", Range(0,2)) = 0.5
         _Density ("Nebula Density", Range(0,3)) = 1.5
@@ -158,13 +158,13 @@ Shader "Custom/TubularGalaxyElectric"
                 // Efecto de "anillos" de energía a lo largo del tubo
                 float energyRings = sin(longitudinal * 8.0 + t * 4.0) * 0.3 * _Pulse;
                 
-                // Mezcla de colores
-                float3 nebulaColor = lerp(_NebulaColor1.rgb, _NebulaColor2.rgb, nebula2);
-                float3 starColor = _StarColor.rgb * (stars + movingStars) * pulseEffect;
-                float3 coreColor = _StarColor.rgb * core * 1.5;
-                float3 electricColor = float3(0.4, 0.9, 2.0) * (electricPulse + energyRings);
+                // Mezcla de colores - mantener morados, solo estrellas en azul
+                float3 nebulaColor = lerp(_NebulaColor1.rgb, _NebulaColor2.rgb, nebula2);  // Mantiene morados
+                float3 starColor = _StarColor.rgb * (stars + movingStars) * pulseEffect;   // Ahora azul
+                float3 coreColor = _StarColor.rgb * core * 1.5;                            // Azul también
+                float3 electricColor = float3(0.4, 0.9, 2.0) * (electricPulse + energyRings); // Mantiene azul eléctrico
                 
-                // Color final
+                // Color final - combinación
                 float3 finalColor = nebulaColor + starColor + coreColor + electricColor;
                 finalColor *= _Intensity * 0.4;
                 

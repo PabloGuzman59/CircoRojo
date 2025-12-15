@@ -8,7 +8,7 @@ public class MinionAI : MonoBehaviour
     public Transform player;
     //Puntos de patrulla del minion
     public Transform[] patrolPoints;
-    
+
     private int currentPoint = 0;
 
     public float detectionRange = 8f;
@@ -25,6 +25,10 @@ public class MinionAI : MonoBehaviour
     //Animaciones
 
     private Animator animator;
+
+    //EFECTOS
+    public AudioClip burnSound;
+    public Material burnMaterial;           
 
     void Awake()
     {
@@ -71,7 +75,18 @@ public class MinionAI : MonoBehaviour
     {
         if (dead) return;
         dead = true;
+        // Aplicar sonido de quemado
+        if (burnSound != null)
+        {
+            AudioSource.PlayClipAtPoint(burnSound, transform.position);
+        }
 
+        // Aplicar material de quemado
+        Renderer rend = GetComponent<Renderer>();
+        if (rend != null && burnMaterial != null)
+        {
+            rend.material = burnMaterial;
+        }
         animator.SetBool("UnderUV", false);
         animator.SetBool("IsWalking", false);
         animator.SetBool("IsScared", true);  // puedes usar Scared como estado de muerte si quieres
@@ -137,7 +152,7 @@ public class MinionAI : MonoBehaviour
 
         if (health != null)
         {
-             animator.SetBool("IsScared", true); // activa animación Monkey_GameOver
+            animator.SetBool("IsScared", true); // activa animación Monkey_GameOver
             Debug.Log("MINION: Tocando al jugador → muerte en 4 segundos.");
             StartCoroutine(KillAfterSeconds(health));
         }
