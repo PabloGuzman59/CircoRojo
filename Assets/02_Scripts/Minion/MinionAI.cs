@@ -52,6 +52,11 @@ public class MinionAI : MonoBehaviour
 
     void Update()
     {
+        // 🔒 BLOQUEAR TODA LA IA MIENTRAS ESTÁ EN SPAWN / APLAUSO
+        // (NavMeshAgent se activa cuando termina el aplauso)
+        if (!agent.enabled)
+            return;
+
         if (dead) return;
 
         // ============================================================
@@ -59,19 +64,13 @@ public class MinionAI : MonoBehaviour
         // ============================================================
         if (takingUV)
         {
+            // Si está recibiendo UV, acumula tiempo
             uvTimer += Time.deltaTime;
+
             agent.isStopped = true;
 
             animator.SetBool("UnderUV", true);
             animator.SetBool("IsWalking", false);
-
-            // 🔊 Sonido mientras quema
-            if (audioSource && burnLoopSound && !audioSource.isPlaying)
-            {
-                audioSource.clip = burnLoopSound;
-                audioSource.loop = true;
-                audioSource.Play();
-            }
 
             if (uvTimer >= uvRequiredTime)
             {
@@ -90,9 +89,6 @@ public class MinionAI : MonoBehaviour
 
             agent.isStopped = false;
             animator.SetBool("UnderUV", false);
-            if (audioSource && audioSource.isPlaying)
-                audioSource.Stop();
-
         }
 
         // ============================================================

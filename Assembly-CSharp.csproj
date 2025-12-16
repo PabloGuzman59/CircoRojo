@@ -67,6 +67,7 @@
     <Compile Include="Assets\01_Scenes\Clariss\Scena Martin\sonidos\sonidos\Generator_Audio.cs" />
     <Compile Include="Assets\01_Scenes\Clariss\Scena Martin\sonidos\sonidos\MonsterStun_Audio.cs" />
     <Compile Include="Assets\02_Scripts\FlashLinterna\FlashlightUV_VR.cs" />
+    <Compile Include="Assets\02_Scripts\Minion\MinionSpawnController.cs" />
     <Compile Include="Assets\02_Scripts\Doors\LockedDoor.cs" />
     <Compile Include="Assets\02_Scripts\Battery\BatteryItem.cs" />
     <Compile Include="Assets\02_Scripts\PlayerVR\PlayerHealthVR.cs" />
