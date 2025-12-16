@@ -29,6 +29,11 @@ public class MinionAI : MonoBehaviour
     // Animaciones
     private Animator animator;
 
+    //EFECTOS
+    public AudioClip burnSound;
+    public Material burnMaterial;
+
+
     void Awake()
     {
         animator = GetComponentInChildren<Animator>();
@@ -94,6 +99,18 @@ public class MinionAI : MonoBehaviour
     {
         if (dead) return;
         dead = true;
+        // Aplicar sonido de quemado
+        if (burnSound != null)
+        {
+            AudioSource.PlayClipAtPoint(burnSound, transform.position);
+        }
+
+        // Aplicar material de quemado
+        Renderer rend = GetComponent<Renderer>();
+        if (rend != null && burnMaterial != null)
+        {
+            rend.material = burnMaterial;
+        }
 
         agent.isStopped = true;
 
