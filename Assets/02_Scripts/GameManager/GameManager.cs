@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 
     public MonsterAI monster;
     public ExitDoor exitDoor;
+    
+    public GeneratorLightGroup[] lightGroups;
 
     void Awake()
     {
@@ -31,6 +33,14 @@ public class GameManager : MonoBehaviour
     {
         activatedGenerators++;
         Debug.Log("GAMEMANAGER: Generadores activados = " + activatedGenerators);
+
+        // ğŸ”¥ PRENDER GRUPO DE LUCES
+        int index = id - 1;
+        if (index >= 0 && index < lightGroups.Length)
+        {
+            lightGroups[index].SetLights(true);
+        }
+
 
         if (activatedGenerators == 1)
         {
@@ -66,10 +76,10 @@ public class GameManager : MonoBehaviour
 
     public void PlayerDied()
     {
-        Debug.Log("GAME MANAGER: Se registró la muerte del jugador.");
-        Debug.Log("GAME OVER: Aquí más adelante activaremos la UI de derrota.");
+        Debug.Log("GAME MANAGER: Se registrÃ³ la muerte del jugador.");
+        Debug.Log("GAME OVER: AquÃ­ mÃ¡s adelante activaremos la UI de derrota.");
 
-        // Más adelante:
+        // MÃ¡s adelante:
         // UIManager.Instance.ShowDeathScreen();
         // Stop time, fade, etc.
     }
@@ -77,6 +87,7 @@ public class GameManager : MonoBehaviour
     public void PlayerEscaped()
     {
         Debug.Log("GAMEMANAGER: El jugador ha escapado. VICTORIA.");
-        // Aquí luego: UI de victoria, cambiar de escena, etc.
+        // AquÃ­ luego: UI de victoria, cambiar de escena, etc.
     }
+
 }

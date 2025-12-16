@@ -29,14 +29,20 @@ public class MinionAI : MonoBehaviour
     // Animaciones
     private Animator animator;
 
-    //EFECTOS
-    public AudioClip burnSound;
-    public Material burnMaterial;
+    // ============================
+    //  EFECTOS DE MUERTE / UV
+    // ============================
+    public AudioSource audioSource;          // AudioSource del minion
+    public AudioClip burnLoopSound;          // Sonido mientras recibe UV
+    public AudioClip burnDeathSound;         // Sonido al morir por UV
+    public Material burnMaterial;            // Material quemado
 
+    private SkinnedMeshRenderer meshRenderer;
 
     void Awake()
     {
         animator = GetComponentInChildren<Animator>();
+        meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
     }
 
     void Start()
@@ -53,13 +59,19 @@ public class MinionAI : MonoBehaviour
         // ============================================================
         if (takingUV)
         {
-            // Si está recibiendo UV, acumula tiempo
             uvTimer += Time.deltaTime;
-
             agent.isStopped = true;
 
             animator.SetBool("UnderUV", true);
             animator.SetBool("IsWalking", false);
+
+            // 🔊 Sonido mientras quema
+            if (audioSource && burnLoopSound && !audioSource.isPlaying)
+            {
+                audioSource.clip = burnLoopSound;
+                audioSource.loop = true;
+                audioSource.Play();
+            }
 
             if (uvTimer >= uvRequiredTime)
             {
@@ -78,6 +90,9 @@ public class MinionAI : MonoBehaviour
 
             agent.isStopped = false;
             animator.SetBool("UnderUV", false);
+            if (audioSource && audioSource.isPlaying)
+                audioSource.Stop();
+
         }
 
         // ============================================================
@@ -99,29 +114,30 @@ public class MinionAI : MonoBehaviour
     {
         if (dead) return;
         dead = true;
-        // Aplicar sonido de quemado
-        if (burnSound != null)
-        {
-            AudioSource.PlayClipAtPoint(burnSound, transform.position);
-        }
-
-        // Aplicar material de quemado
-        Renderer rend = GetComponent<Renderer>();
-        if (rend != null && burnMaterial != null)
-        {
-            rend.material = burnMaterial;
-        }
 
         agent.isStopped = true;
 
+        // 🔊 Sonido de muerte
+        if (audioSource)
+        {
+            audioSource.Stop();
+            if (burnDeathSound)
+                audioSource.PlayOneShot(burnDeathSound);
+        }
+
+        // 🔥 Material quemado
+        if (meshRenderer && burnMaterial)
+            meshRenderer.material = burnMaterial;
+
         animator.SetBool("UnderUV", false);
         animator.SetBool("IsWalking", false);
-        animator.SetBool("IsScared", true);  // animación de muerte
+        animator.SetBool("IsScared", true);
 
         Debug.Log("MINION MUERTO POR LUZ UV TRAS 4 SEGUNDOS");
 
-        Destroy(gameObject, 1.2f); // tiempo para animación
+        Destroy(gameObject, 1.2f);
     }
+
 
     void Patrol()
     {
@@ -161,7 +177,8 @@ public class MinionAI : MonoBehaviour
 
             CameraControl cameraControl = Camera.main.GetComponent<CameraControl>();
             if (cameraControl != null)
-                cameraControl.TriggerGameOver();
+                cameraControl.TriggerJumpscare(transform);
+
 
             Debug.Log("MINION: Tocando al jugador → muerte en 4 segundos.");
             StartCoroutine(KillAfterSeconds(health));

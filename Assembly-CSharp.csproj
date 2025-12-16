@@ -90,6 +90,7 @@
     <Compile Include="Assets\02_Scripts\VR\Flash\FlashlightNormal_VR.cs" />
     <Compile Include="Assets\02_Scripts\Minion\MinionAI.cs" />
     <Compile Include="Assets\02_Scripts\PlayerVR\XRPlayerMovement.cs" />
+    <Compile Include="Assets\02_Scripts\Lights\GeneratorLightGroup.cs" />
     <Compile Include="Assets\02_Scripts\Player\PlayerMovement.cs" />
     <Compile Include="Assets\02_Scripts\Monster\MonsterAI.cs" />
     <Compile Include="Assets\02_Scripts\Minion\PlayerMinionSpawner.cs" />
@@ -638,14 +639,6 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
       <HintPath>Library\PackageCache\com.unity.collections@aea9d3bd5e19\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Android.Types">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Types.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Android.Gradle">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.62f1\Editor\Data\PlaybackEngines\AndroidPlayer\Unity.Android.Gradle.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

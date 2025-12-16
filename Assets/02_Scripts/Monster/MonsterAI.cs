@@ -212,10 +212,17 @@ public class MonsterAI : MonoBehaviour
 
         if (health != null && !isPassive)
         {
-            animator.SetBool("isDead", true); // animación game over
+            // Detener persecución
+            animator.SetBool("isChasing", false);
 
+            // 📸 Jumpscare de cámara
+            CameraControl camera = Camera.main.GetComponent<CameraControl>();
+            if (camera != null)
+                camera.TriggerJumpscare(transform);
 
+            // ☠️ Matar jugador
             health.KillPlayer();
         }
     }
+
 }
