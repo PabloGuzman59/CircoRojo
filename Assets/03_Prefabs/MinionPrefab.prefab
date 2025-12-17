@@ -280,7 +280,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 2390851153026378346}
-  player: {fileID: 0}
+  player: {fileID: 7160186917370182065, guid: 2337e3928f22c8b4c9faa223cdbad6f6, type: 3}
   patrolPoints:
   - {fileID: 0}
   - {fileID: 0}
@@ -289,9 +289,11 @@ MonoBehaviour:
   detectionRange: 8
   uvRequiredTime: 4
   uvDecaySpeed: 1.5
-  audioSource: {fileID: 0}
-  burnLoopSound: {fileID: 0}
-  burnDeathSound: {fileID: 0}
+  audioSource: {fileID: 2090671380274959652}
+  walkClip: {fileID: 8300000, guid: 391085be89ba15b489012470a600b206, type: 3}
+  uvClip: {fileID: 8300000, guid: 2da609675f56d9b4492638bf6ad6c328, type: 3}
+  attackClip: {fileID: 8300000, guid: 7361a2318f71f104da10f1799203570d, type: 3}
+  deathClip: {fileID: 8300000, guid: 708a78d6a36b3664a85e6da7d1112000, type: 3}
   burnMaterial: {fileID: 2100000, guid: 0e979edbbcf556f489fdb3f5eef84147, type: 2}
 --- !u!114 &2584948592965914663
 MonoBehaviour:

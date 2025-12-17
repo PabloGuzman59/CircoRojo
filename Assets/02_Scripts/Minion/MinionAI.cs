@@ -30,14 +30,21 @@ public class MinionAI : MonoBehaviour
     private Animator animator;
 
     // ============================
-    //  EFECTOS DE MUERTE / UV
+    //  SONIDOS DEL MINION
     // ============================
-    public AudioSource audioSource;          // AudioSource del minion
-    public AudioClip burnLoopSound;          // Sonido mientras recibe UV
-    public AudioClip burnDeathSound;         // Sonido al morir por UV
-    public Material burnMaterial;            // Material quemado
+    public AudioSource audioSource;
 
+    public AudioClip walkClip;        // monoCaminando.mp3
+    public AudioClip uvClip;          // MonoUV.mp3
+    public AudioClip attackClip;      // MonoEnojado.mp3
+    public AudioClip deathClip;       // monoDesintegrarse.mp3
+
+    // Material de muerte
+    public Material burnMaterial;
     private SkinnedMeshRenderer meshRenderer;
+
+    private bool wasWalking = false;
+    private bool wasUnderUV = false;
 
     void Awake()
     {
@@ -52,11 +59,6 @@ public class MinionAI : MonoBehaviour
 
     void Update()
     {
-        // 🔒 BLOQUEAR TODA LA IA MIENTRAS ESTÁ EN SPAWN / APLAUSO
-        // (NavMeshAgent se activa cuando termina el aplauso)
-        if (!agent.enabled)
-            return;
-
         if (dead) return;
 
         // ============================================================
@@ -64,13 +66,18 @@ public class MinionAI : MonoBehaviour
         // ============================================================
         if (takingUV)
         {
-            // Si está recibiendo UV, acumula tiempo
             uvTimer += Time.deltaTime;
-
             agent.isStopped = true;
 
             animator.SetBool("UnderUV", true);
             animator.SetBool("IsWalking", false);
+
+            // 🔊 sonido UV
+            if (!wasUnderUV)
+            {
+                PlayLoop(uvClip);
+                wasUnderUV = true;
+            }
 
             if (uvTimer >= uvRequiredTime)
             {
@@ -80,19 +87,24 @@ public class MinionAI : MonoBehaviour
         }
         else
         {
-            // 🔥 CLAVE: NO reiniciar el contador de golpe
             if (uvTimer > 0f)
             {
                 uvTimer -= uvDecaySpeed * Time.deltaTime;
                 uvTimer = Mathf.Max(uvTimer, 0f);
             }
 
-            agent.isStopped = false;
             animator.SetBool("UnderUV", false);
+            agent.isStopped = false;
+
+            if (wasUnderUV)
+            {
+                StopSound();
+                wasUnderUV = false;
+            }
         }
 
         // ============================================================
-        //  MOVIMIENTO NORMAL (PERSEGUIR / PATRULLAR)
+        //  MOVIMIENTO NORMAL
         // ============================================================
         float distToPlayer = Vector3.Distance(transform.position, player.position);
 
@@ -101,9 +113,20 @@ public class MinionAI : MonoBehaviour
         else
             Patrol();
 
-        // ACTUALIZAR ANIMACIÓN DE CAMINAR (MUY IMPORTANTE)
-        bool isMoving = agent.velocity.magnitude > 0.05f;
+        bool isMoving = agent.velocity.magnitude > 0.1f;
         animator.SetBool("IsWalking", isMoving);
+
+        // 🔊 sonido de pasos
+        if (isMoving && !takingUV && !wasWalking)
+        {
+            PlayLoop(walkClip);
+            wasWalking = true;
+        }
+        else if (!isMoving && wasWalking)
+        {
+            StopSound();
+            wasWalking = false;
+        }
     }
 
     void DieByUV()
@@ -112,16 +135,12 @@ public class MinionAI : MonoBehaviour
         dead = true;
 
         agent.isStopped = true;
+        StopSound();
 
-        // 🔊 Sonido de muerte
-        if (audioSource)
-        {
-            audioSource.Stop();
-            if (burnDeathSound)
-                audioSource.PlayOneShot(burnDeathSound);
-        }
+        // 🔊 sonido de muerte
+        PlayOneShot(deathClip);
 
-        // 🔥 Material quemado
+        // 🔥 material quemado
         if (meshRenderer && burnMaterial)
             meshRenderer.material = burnMaterial;
 
@@ -129,11 +148,10 @@ public class MinionAI : MonoBehaviour
         animator.SetBool("IsWalking", false);
         animator.SetBool("IsScared", true);
 
-        Debug.Log("MINION MUERTO POR LUZ UV TRAS 4 SEGUNDOS");
+        Debug.Log("MINION MUERTO POR LUZ UV");
 
-        Destroy(gameObject, 1.2f);
+        Destroy(gameObject, 1.5f);
     }
-
 
     void Patrol()
     {
@@ -146,12 +164,11 @@ public class MinionAI : MonoBehaviour
     }
 
     // ============================================================
-    //  INTERFAZ DE LUZ UV (LLAMADA DESDE LA LINTERNA)
+    //  INTERFAZ DE LUZ UV
     // ============================================================
     public void ApplyUV(bool active)
     {
         if (dead) return;
-
         takingUV = active;
     }
 
@@ -160,45 +177,23 @@ public class MinionAI : MonoBehaviour
     // ============================================================
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("MINION: Algo entró → " + other.name);
-
         PlayerHealthVR health = other.GetComponentInParent<PlayerHealthVR>();
-        PlayerMovement movement = other.GetComponentInParent<PlayerMovement>();
 
-        if (health != null)
+        if (health != null && !dead)
         {
             animator.SetBool("IsScared", true);
             animator.SetBool("IsWalking", false);
-            animator.SetBool("IsChasing", false);
 
-            CameraControl cameraControl = Camera.main.GetComponent<CameraControl>();
-            if (cameraControl != null)
-                cameraControl.TriggerJumpscare(transform);
+            // 🔊 sonido de ataque
+            PlayOneShot(attackClip);
 
+            // 🎥 jumpscare
+            CameraControl cam = Camera.main.GetComponent<CameraControl>();
+            if (cam != null)
+                cam.TriggerJumpscare(transform);
 
-            Debug.Log("MINION: Tocando al jugador → muerte en 4 segundos.");
             StartCoroutine(KillAfterSeconds(health));
         }
-
-        if (movement != null)
-        {
-            Debug.Log("MINION: Ralentizando jugador...");
-            StartCoroutine(SlowPlayer(movement));
-        }
-    }
-
-    // ============================================================
-    //  Ralentizar jugador
-    // ============================================================
-    System.Collections.IEnumerator SlowPlayer(PlayerMovement pm)
-    {
-        float originalSpeed = pm.walkSpeed;
-        pm.walkSpeed = 2f;
-
-        yield return new WaitForSeconds(2f);
-
-        pm.walkSpeed = originalSpeed;
-        Debug.Log("MINION: Ralentización terminada.");
     }
 
     // ============================================================
@@ -208,5 +203,29 @@ public class MinionAI : MonoBehaviour
     {
         yield return new WaitForSeconds(4f);
         health.KillPlayer();
+    }
+
+    // ============================
+    //  HELPERS DE AUDIO
+    // ============================
+    void PlayLoop(AudioClip clip)
+    {
+        if (!audioSource || !clip) return;
+        audioSource.clip = clip;
+        audioSource.loop = true;
+        audioSource.Play();
+    }
+
+    void PlayOneShot(AudioClip clip)
+    {
+        if (!audioSource || !clip) return;
+        audioSource.PlayOneShot(clip);
+    }
+
+    void StopSound()
+    {
+        if (!audioSource) return;
+        audioSource.Stop();
+        audioSource.loop = false;
     }
 }

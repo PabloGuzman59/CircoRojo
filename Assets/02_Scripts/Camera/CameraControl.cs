@@ -2,28 +2,28 @@
 
 public class CameraControl : MonoBehaviour
 {
-    [Header("Jumpscare Settings")]
+    [Header("Jumpscare")]
     public float jumpscareDistance = 0.5f;
     public float jumpscareSpeed = 10f;
     public AudioSource audioSource;
     public AudioClip jumpscareSound;
 
-    private bool jumpscareActive = false;
-    private Transform enemyTarget;
+    private bool active;
+    private Transform enemy;
 
     void Awake()
     {
-        if (audioSource == null)
+        if (!audioSource)
             audioSource = GetComponent<AudioSource>();
     }
 
     void LateUpdate()
     {
-        if (!jumpscareActive || enemyTarget == null) return;
+        if (!active || enemy == null) return;
 
         Vector3 targetPos =
-            enemyTarget.position +
-            enemyTarget.forward * jumpscareDistance +
+            enemy.position +
+            enemy.forward * jumpscareDistance +
             Vector3.up * 0.15f;
 
         transform.position = Vector3.Lerp(
@@ -32,23 +32,20 @@ public class CameraControl : MonoBehaviour
             jumpscareSpeed * Time.unscaledDeltaTime
         );
 
-        Quaternion lookRot =
-            Quaternion.LookRotation(enemyTarget.position - transform.position);
-
+        Quaternion rot = Quaternion.LookRotation(enemy.position - transform.position);
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
-            lookRot,
+            rot,
             jumpscareSpeed * Time.unscaledDeltaTime
         );
     }
 
-    // 🔥 LLAMADO POR MINION O MONSTER
-    public void TriggerJumpscare(Transform enemy)
+    public void TriggerJumpscare(Transform enemyTransform)
     {
-        if (jumpscareActive) return;
+        if (active) return;
 
-        jumpscareActive = true;
-        enemyTarget = enemy;
+        active = true;
+        enemy = enemyTransform;
 
         if (audioSource && jumpscareSound)
             audioSource.PlayOneShot(jumpscareSound);
