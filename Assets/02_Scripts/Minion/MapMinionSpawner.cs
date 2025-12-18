@@ -16,7 +16,7 @@ public class MapMinionSpawner : MonoBehaviour
         {
             timer = 0;
             TrySpawn();
-        }
+        }   
     }
 
     void TrySpawn()

@@ -23,7 +23,7 @@ public class MinionAI : MonoBehaviour
     private float uvTimer = 0f;
     public float uvRequiredTime = 4f; // tiempo necesario bajo UV
 
-    // 🔥 NUEVO: velocidad a la que se pierde el efecto UV
+    // 🔥 velocidad a la que se pierde el efecto UV
     public float uvDecaySpeed = 1.5f;
 
     // Animaciones
@@ -45,6 +45,15 @@ public class MinionAI : MonoBehaviour
 
     private bool wasWalking = false;
     private bool wasUnderUV = false;
+
+    // ============================
+    //  ATAQUE: SLOW + MUERTE
+    // ============================
+    public float slowSpeed = 2f;        // velocidad del jugador atrapado
+    public float slowDuration = 7f;     // cuánto dura la ralentización
+    public float killDelay = 7f;         // tiempo total hasta matar
+
+    private bool isAttacking = false;    // 🔒 evita muerte instantánea
 
     void Awake()
     {
@@ -129,6 +138,9 @@ public class MinionAI : MonoBehaviour
         }
     }
 
+    // ============================================================
+    //  MUERTE POR UV
+    // ============================================================
     void DieByUV()
     {
         if (dead) return;
@@ -173,36 +185,59 @@ public class MinionAI : MonoBehaviour
     }
 
     // ============================================================
-    //  COLISIONES CON PLAYER
+    //  ATAQUE AL JUGADOR (NO MUERE AL TOQUE)
     // ============================================================
     private void OnTriggerEnter(Collider other)
     {
         PlayerHealthVR health = other.GetComponentInParent<PlayerHealthVR>();
+        PlayerMovement movement = other.GetComponentInParent<PlayerMovement>();
 
-        if (health != null && !dead)
-        {
-            animator.SetBool("IsScared", true);
-            animator.SetBool("IsWalking", false);
+        if (health == null || dead) return;
+        if (isAttacking) return;   // 🔒 CLAVE
 
-            // 🔊 sonido de ataque
-            PlayOneShot(attackClip);
+        isAttacking = true;
 
-            // 🎥 jumpscare
-            CameraControl cam = Camera.main.GetComponent<CameraControl>();
-            if (cam != null)
-                cam.TriggerJumpscare(transform);
+        Debug.Log("MINION: Jugador atrapado, iniciando cuenta regresiva");
 
-            StartCoroutine(KillAfterSeconds(health));
-        }
+        animator.SetBool("IsScared", true);
+        animator.SetBool("IsWalking", false);
+
+        // 🔊 sonido de ataque
+        PlayOneShot(attackClip);
+
+        // 🐌 ralentizar jugador
+        if (movement != null)
+            StartCoroutine(SlowPlayerForSeconds(movement, slowSpeed, slowDuration));
+
+        // ☠️ matar luego de X segundos (TIEMPO REAL)
+        StartCoroutine(KillAfterSecondsRealtime(health, killDelay));
     }
 
     // ============================================================
-    //  Matar jugador luego de 4 segundos
+    //  Ralentizar jugador
     // ============================================================
-    System.Collections.IEnumerator KillAfterSeconds(PlayerHealthVR health)
+    System.Collections.IEnumerator SlowPlayerForSeconds(PlayerMovement pm, float newSpeed, float seconds)
     {
-        yield return new WaitForSeconds(4f);
-        health.KillPlayer();
+        float originalSpeed = pm.walkSpeed;
+        pm.walkSpeed = newSpeed;
+
+        yield return new WaitForSecondsRealtime(seconds);
+
+        pm.walkSpeed = originalSpeed;
+    }
+
+    // ============================================================
+    //  Matar jugador luego de X segundos (Realtime)
+    // ============================================================
+    System.Collections.IEnumerator KillAfterSecondsRealtime(PlayerHealthVR health, float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+
+        if (health != null && !health.isDead)
+        {
+            Debug.Log("MINION: Tiempo cumplido → matar jugador");
+            health.KillPlayer(); // 🔥 aquí se lanza el video vía GameOverManager
+        }
     }
 
     // ============================

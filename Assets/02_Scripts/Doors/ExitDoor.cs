@@ -31,6 +31,7 @@ public class ExitDoor : SimpleInteractable
         Debug.Log("EXIT DOOR: Has interactuado con la puerta de salida.");
         Debug.Log("VICTORIA: El jugador escapó del nivel.");
 
+        VictoryManager vm = FindObjectOfType<VictoryManager>();
         // Avisar al GameManager
         GameManager.instance.PlayerEscaped();
 

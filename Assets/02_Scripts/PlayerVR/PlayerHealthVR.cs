@@ -1,47 +1,39 @@
-using UnityEngine;
-using UnityEngine.Video;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 
 public class PlayerHealthVR : MonoBehaviour
 {
     public bool isDead = false;
 
-    [Header("Game Over Video")]
-    public VideoPlayer gameOverVideo;
+    public static PlayerHealthVR Instance;
 
-    void Start()
+    void Awake()
     {
-        if (gameOverVideo != null)
-        {
-            gameOverVideo.loopPointReached += OnVideoFinished;
-        }
+        Instance = this;
     }
 
     public void KillPlayer()
     {
-        if (isDead) return;
+        if (isDead)
+        {
+            Debug.LogWarning("⚠️ KillPlayer ignorado (ya estaba muerto)");
+            return;
+        }
 
         isDead = true;
-        Debug.Log("GAME OVER � El jugador ha muerto.");
 
-        // Pausa el juego
-        Time.timeScale = 0f;
+        Debug.LogError("☠️ PLAYER: Muerte registrada");
+        Debug.LogError("☠️ StackTrace:\n" + System.Environment.StackTrace);  
 
-        // El VideoPlayer funciona con tiempo no escalado
-        if (gameOverVideo != null)
+        // 🔔 Avisar al GameOverManager
+        GameOverManager gom = FindObjectOfType<GameOverManager>();
+        if (gom != null)
         {
-            gameOverVideo.Play();
+            Debug.Log("🎬 Llamando a GameOverManager.TriggerGameOver()");
+            gom.TriggerGameOver();
         }
-    }
-
-    void OnVideoFinished(VideoPlayer vp)
-    {
-        Debug.Log("Video Game Over terminado. Reiniciando juego...");
-
-        // Volvemos el tiempo a normal
-        Time.timeScale = 1f;
-
-        // Reiniciar escena actual
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        else
+        {
+            Debug.LogError("❌ GameOverManager NO encontrado en la escena");
+        }
     }
 }
