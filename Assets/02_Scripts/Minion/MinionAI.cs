@@ -13,7 +13,7 @@ public class MinionAI : MonoBehaviour
     private int currentPoint = 0;
 
     public float detectionRange = 8f;
-
+    private Coroutine killCoroutine;
     private bool dead = false;
 
     // ============================
@@ -21,7 +21,7 @@ public class MinionAI : MonoBehaviour
     // ============================
     private bool takingUV = false;
     private float uvTimer = 0f;
-    public float uvRequiredTime = 4f; // tiempo necesario bajo UV
+    public float uvRequiredTime = 2f; // tiempo necesario bajo UV
 
     // 🔥 velocidad a la que se pierde el efecto UV
     public float uvDecaySpeed = 1.5f;
@@ -193,7 +193,7 @@ public class MinionAI : MonoBehaviour
         PlayerMovement movement = other.GetComponentInParent<PlayerMovement>();
 
         if (health == null || dead) return;
-        if (isAttacking) return;   // 🔒 CLAVE
+        if (isAttacking) return;
 
         isAttacking = true;
 
@@ -202,16 +202,27 @@ public class MinionAI : MonoBehaviour
         animator.SetBool("IsScared", true);
         animator.SetBool("IsWalking", false);
 
-        // 🔊 sonido de ataque
         PlayOneShot(attackClip);
 
-        // 🐌 ralentizar jugador
         if (movement != null)
             StartCoroutine(SlowPlayerForSeconds(movement, slowSpeed, slowDuration));
 
-        // ☠️ matar luego de X segundos (TIEMPO REAL)
-        StartCoroutine(KillAfterSecondsRealtime(health, killDelay));
+        // ⏱ guardar referencia
+        killCoroutine = StartCoroutine(KillAfterSecondsRealtime(health, killDelay));
     }
+    private void OnTriggerExit(Collider other)
+    {
+        PlayerHealthVR health = other.GetComponentInParent<PlayerHealthVR>();
+        if (health == null) return;
+
+        Debug.Log("MINION: Jugador escapó → cancelar ataque");
+
+        if (killCoroutine != null)
+            StopCoroutine(killCoroutine);
+
+        isAttacking = false;
+    }
+
 
     // ============================================================
     //  Ralentizar jugador
